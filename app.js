@@ -19,66 +19,121 @@
 //
 console.log("hi");
 //GLOBAL VARIABLES
-let myContainer = document.querySelector("section");
-let myButton = document.querySelector("section + div");
 
-let image1 = document.querySelector("sectioning:first-child");
-let image2 = document.querySelector("section img:nth-child(2)");
+let myContainer = document.getElementById("DuckImages");
+let myButton = document.getElementById("results-button");
+let resultssection = document.getElementById("results");
 
-let allGoats = [];
+let image1 = document.getElementById("pic1");
+let image2 = document.getElementById("pic2");
+let image3 = document.getElementById("pic3");
+let duckNames = [
+  "bag",
+  "banana",
+  "bathroom",
+  "boots",
+  "bubblegum",
+  "chair",
+  "cthulhu",
+  "dog-duck",
+  "pen",
+  "pen",
+  "pet-sweep",
+  "scissors",
+  "shark",
+  "unicorn",
+  "water-can",
+  "wine-glass",
+];
+let allDucks = [];
 let clicks = 0;
 
 let clicksAllowed = 15;
 //FUNCTIONS
-function getRandomGoat() {
-  return Math.floor(Math.random() * allGoats.length);
+function getRandomIndex() {
+  return Math.floor(Math.random() * allDucks.length);
 }
 
 // CONSTRUCTORS
 
-function Goat(name, fileExtension = "jpg") {
+function Duck(name, fileExtension = "jpg") {
   this.name = name;
   this.src = `images/${this.name}.${fileExtension}`;
   this.clicks = 0;
   this.views = 0;
+  allDucks.push(this);
 }
 
-function handleGoatClick(event) {
-  if (event.target === myContainer) alert("Please click an image");
+for (let i = 0; i < duckNames.length; i++) {
+  new Duck(duckNames[i]);
 }
-clicks++;
-let clickedGoat = event.target.alt;
-console.log(clickedGoat);
+
+function getImages() {
+  let imagesIndexes = [];
+  let newindex = getRandomIndex();
+  while (imagesIndexes.length < 3) {
+    if (!imagesIndexes.includes(newindex)) {
+      imagesIndexes.push(newindex);
+    } else {
+      newindex = getRandomIndex();
+    }
+  }
+
+  let index1 = imagesIndexes.shift();
+  let index2 = imagesIndexes.shift();
+  let index3 = imagesIndexes.shift();
+  image1.src = allDucks[index1].src;
+  image2.src = allDucks[index2].src;
+  image3.src = allDucks[index3].src;
+  image1.alt = allDucks[index1].name;
+  image2.alt = allDucks[index2].name;
+  image3.alt = allDucks[index3].name;
+  image1.id = index1;
+  image2.id = index2;
+  image3.id = index3;
+  allDucks[index1].views += 1;
+  allDucks[index2].views += 1;
+  allDucks[index3].views += 1;
+  console.log(allDucks);
+}
 
 function handleButtonClick(event) {
-  if (clicks === clickAllowed) {
-    renderResults();
+  let id = parseInt(event.target.id);
+  let duck = allDucks[id];
+  duck.clicks += 1;
+  clicks += 1;
+  if (clicks === clicksAllowed) {
+    myContainer.removeEventListener("click", handleButtonClick);
+    myContainer.textContent = "";
+    myButton.hidden = false;
+  } else {
+    getImages();
   }
+  // // if(clicks === clickAllowed) {
+  //   renderResults();
+  // }
 }
+getImages();
+
+//   if (event.target === myContainer) alert("Please click an image");
+// }
+// clicks++;
+// let clickedGoat = event.target.alt;
+// console.log(clickedGoat);
 
 function renderResults() {
-  let ul = document.querySelector("ul");
-  for (let i = 0; i > allGoats.length; i++) {
+  let ul = document.createElement("ul");
+  resultssection.appendChild(ul);
+  for (let i = 0; i < allDucks.length; i++) {
     let li = document.createElement("li");
-    li.textContent = `${allGoats[i].name} had ${allGoats[i].views}`;
+    li.textContent = `${allDucks[i].name} had ${allDucks[i].views} views and ${allDucks[i].clicks} clicks`;
+    ul.appendChild(li);
   }
 }
 
 //EXECUTABLE CODE
 
-let cruisin = new Goat("");
-let float = new Goat("");
-let hand = new Goat("");
-let kissing = new Goat("");
-let sassy = new Goat("");
-let smile = new Goat("");
-let sweater = new Goat("");
+// renderGoats();
 
-allGoats.push(cruisin, float, hand, kissing, sassy, smile, sweater);
-
-renderGoats();
-
-myContainer.addEventListener("click", handleGoatClick);
-
-image1.src = allGoats[0].src;
-image2.src = allGoats[1].src;
+myContainer.addEventListener("click", handleButtonClick);
+myButton.addEventListener("click", renderResults);
